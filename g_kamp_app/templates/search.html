@@ -1,0 +1,30 @@
+{% extends 'home.html' %}
+
+{% block content %}
+<form action="{% url 'g_kamp_app:search' %}" method="get">
+        {% csrf_token %}
+        <input id='limits' value="{{ limits }}" type='number' name='limits' placeholder='max 50'>
+        <select id='state' value="{{ state }}" name='state'>
+            {% for key, name in states.items%}
+                {% if key == state %}
+                    <option selected value="{{ key }}">{{ name }}</option>
+                {% else %}
+                    <option value="{{ key }}">{{ name }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        {% comment %} {% if current_offset == 0%}
+            <button type='submit'>Search</button>
+        {% else %} {% endcomment %}
+            <button id='pageBack' type='submit'>Previous Page</button>
+            <button type='submit'>Next Page</button>
+        {% comment %} {% endif %} {% endcomment %}
+        <input id='current_offset' value='{{ current_offset|add:limits }}' type='hidden' name="current_offset">
+        <button id='reset'>Reset</button>
+    </form>
+
+    {% for i in RECDATA.RECDATA %}
+        <h2><a href="campground/{{ i.FacilityID }}">{{ i.FacilityName }}</a> -- {{ i.FacilityID }}</h2>
+    {% endfor %}
+
+{% endblock content %}

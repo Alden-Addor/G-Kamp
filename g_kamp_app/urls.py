@@ -3,5 +3,7 @@ from . import views
 
 app_name = 'g_kamp_app'
 urlpatterns = [
-    path('check/', views.check, name='check')
+    path('', views.home, name='home'),
+    path('search/', views.search, name='search'),
+    path('campground/<int:facilityID>', views.campground, name='campground')
 ]
