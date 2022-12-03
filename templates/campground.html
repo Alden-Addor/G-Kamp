@@ -1,0 +1,56 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+{% if campsites.METADATA.RESULTS.TOTAL_COUNT == 0 %}
+    <p>Sorry, but this campground doesn't have any campsites avalible.</p>
+{% else %}
+    <h1>{{ data.FacilityName }}</h1>
+    <p id='description'>{{ data.FacilityDescription }}</p>
+
+    {% for i in campsites.RECDATA %}
+        <li>{{ i.CampsiteName }} -- {{ i.CampsiteID }}</li>
+    {% endfor %}
+{% endif %}<br>
+
+    <form action="{% url 'g_kamp_app:campground' data.FacilityID index %}" method='get'>
+        {% csrf_token %}
+        <input id='offset' value='{{ offset }}' name='offset' type='hidden'>
+        <input id='limit' value='{{ params.limit }}' name='limit' type='hidden'>
+        {% if campsites.METADATA.SEARCH_PARAMETERS.OFFSET > 0%}
+            <button id='back' type='submit'>Back</button>
+        {% endif %}
+        {% if campsites.METADATA.RESULTS.CURRENT_COUNT == 25 %}
+            <button id='forward' type='submit'>Next</button>
+        {% endif %}
+    </form>
+
+<script>
+    let description = document.getElementById('description')
+    description.innerHTML = description.innerText
+    
+    let back = document.getElementById('back')
+    if (back){
+    back.addEventListener('click', function(){
+        let offset = document.getElementById('offset')
+        console.log(offset.value)
+        let limit = document.getElementById('limit')
+        console.log(limit.value)
+        document.getElementById('offset').value = offset.value - limit.value
+    })}
+    
+    let next = document.getElementById('forward')
+    if (next){
+    next.addEventListener('click', function(){
+        let offset = document.getElementById('offset')
+        console.log(offset.value)
+        let limit = document.getElementById('limit')
+        console.log(limit.value)
+        document.getElementById('offset').value = offset.value + limit.value
+    })}
+    console.log(offset.value)
+    console.log(limit.value)
+</script>
+
+{% endblock content %}
+

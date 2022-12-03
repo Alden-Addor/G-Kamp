@@ -7,6 +7,7 @@ def home(request):
     return render(request, 'home.html')
 
 def search(request):
+    # campground = 
     states = {
         "AL": 'Alabama',
         "AK": 'Alaska',
@@ -66,21 +67,22 @@ def search(request):
     params = {
         'apikey': 'dfed6d80-0ffe-4284-ac92-91a0fc1b901b',
         'limit': limits,
-        'offset': page, # 'page' when figuring on paging.
+        'offset': page,
         'state': state,
         'activity': 'camping'
     }
-    RECDATA = requests.get('https://ridb.recreation.gov/api/v1/facilities', params= params).json()
-    request.session['RECDATA'] = RECDATA
-    request.session['params'] = params
-    return render(request, 'search.html', {'RECDATA': RECDATA, 'current_offset': page, 'limits': limits, 'state': state, 'states': states})
+    data = requests.get('https://ridb.recreation.gov/api/v1/facilities', params= params).json()
+    request.session['data'] = data
+    return render(request, 'search.html', {'data': data, 'current_offset': page, 'limits': limits, 'state': state, 'states': states})
 
-def campground(request, facilityID):
-    if "RECDATA" not in request.session:
+def campground(request, facilityID, index):
+    if "data" not in request.session:
         return HttpResponseRedirect(reverse('g_kamp_app:home'))
-    data = request.session['RECDATA']
-    params = request.session['params']
-    limit = params['limit']
-    current_offset = params['offset']
-    campsites = requests.get(f'https://ridb.recreation.gov/api/v1/facilities/{facilityID}/campsites?apikey=dfed6d80-0ffe-4284-ac92-91a0fc1b901b&limit=5&offset=0').json()
-    return render(request, 'campground.html', {'campsites':campsites, 'RECDATA': data, 'params':params, 'current_offset': current_offset, 'limits': limit})
+    data = request.session['data']
+    page = request.GET.get('offset', 0)
+    params = {
+        'limit': 25,
+        'offset': page
+    }
+    campsites = requests.get(f'https://ridb.recreation.gov/api/v1/facilities/{facilityID}/campsites?apikey=dfed6d80-0ffe-4284-ac92-91a0fc1b901b', params = params).json()
+    return render(request, 'campground.html', {'campsites':campsites, 'data': data['RECDATA'][index], 'params':params, 'offset': page, 'index': index})

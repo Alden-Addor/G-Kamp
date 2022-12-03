@@ -1,8 +1,29 @@
-{% extends 'index.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}G-Kamp{% endblock  %}</title>
+</head>
+<body>
+    <h1>G-Kamp</h1>
+    <h3>Camping with the governments finest!</h3>
 
-{% block content %}
-
-    <form action="{% url 'g_kamp_app:search' %}" method="get">
+    <nav>
+        {% block nav %}{% endblock nav %}
+        {% if user.is_authenticated %}
+            <p>Hi {{ user.username }}!</p>
+            <a href="{% url 'logout' %}">Log Out</a>
+        {% endif %}{% comment %}{% else %}
+            <p>Please log in or signup!</p>
+            <a href="{% url 'login' %}">Log In</a>
+            <a href="{% url 'signup' %}">Sign Up</a>
+        {% endcomment %}
+        <a href="{% url 'g_kamp_app:home' %}">Home</a> 
+    </nav>
+    {% comment %} <form action="{% url 'g_kamp_app:search' %}" method="get">
         {% csrf_token %}
         <input id='limits' value="limits" type='number' name='limits' placeholder='max 50'>
         <select id='state' value="state" name='state'>
@@ -57,16 +78,32 @@
             <option value="WV">West Virginia</option>
             <option value="WI">Wisconsin</option>
             <option value="WY">Wyoming</option>
-            {% comment %} {% for key, name in states.items%}
+            {% for key, name in states.items%}
                 {% if key == state %}
                     <option selected value="{{ key }}">{{ name }}</option>
                 {% else %}
                     <option value="{{ key }}">{{ name }}</option>
                 {% endif %}
-            {% endfor %} {% endcomment %}
+            {% endfor %} 
         </select>
+        {% if current_offset == 0%}
         <button type='submit'>Search</button>
-    </form>
+        {% else %}
+            <button id='pageBack' type='submit'>Previous Page</button>
+            <button type='submit'>Next Page</button>
+        {% endif %}
+        
+
+        <button type='submit'>
+            {% if current_offset == 0%}
+                Search
+            {% else %}
+                View Next Page
+            {% endif %}
+        </button>
+        <input id='current_offset' value='{{ current_offset|add:limits }}' type='hidden' name="current_offset">
+        <button id='reset'>Reset</button>
+    </form> {% endcomment %}
     
     {% comment %} <form action="{% url g_kamp_app:campground %}" method="get"> {% endcomment %}
         {% comment %} {% csrf_token %}
@@ -76,4 +113,27 @@
     {% comment %} </form> {% endcomment %}
 
     
-{% endblock content %}
+
+    {% block content %}
+    {% endblock content %}
+
+    <script>
+        {% comment %} JS for reset button on search page. {% endcomment %}
+        {% comment %} let reset = document.querySelector('#reset')
+        reset.addEventListener('click', function(){
+            document.getElementById("limits").value = 1
+            document.getElementById("state").value = null
+            document.getElementById("current_offset").value = 0
+        })
+        console.log(current_offset.value) {% endcomment %}
+        {% comment %} JS for backbutton logic on search page. {% endcomment %}
+        let pageBack = document.querySelector('#pageBack')
+        pageBack.addEventListener('click', function(){
+            let limits = document.getElementById('limits').value
+            let current_offset = document.getElementById('current_offset').value
+            console.log(current_offset)
+            document.getElementById('current_offset').value = current_offset - (limits*2)
+        })
+    </script>
+</body>
+</html>
