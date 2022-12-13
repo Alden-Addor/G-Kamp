@@ -2,10 +2,12 @@
 
 {% block content %}
 
+{% comment %} Form has saved data from initial search on the home page {% endcomment %}
     <form action="{% url 'g_kamp_app:search' %}" method="get">
         {% csrf_token %}
         <input id='limits' value="{{ limits }}" type='number' name='limits' placeholder='max 50'>
         <select id='state' value="{{ state }}" name='state'>
+{% comment %} For loop to that gets state data from states variable that is saved in the search view {% endcomment %}
             {% for key, name in states.items%}
                 {% if key == state %}
                     <option selected value="{{ key }}">{{ name }}</option>
@@ -15,13 +17,110 @@
             {% endfor %}
         </select>
             <button id='pageBack' type='submit'>Previous Page</button>
-            <button type='submit'>Next Page</button>
-        <input id='current_offset' value='{{ current_offset|add:limits }}' type='hidden' name="current_offset">
-        <a id='reset' href="..">Reset</a>
+            <button type='submit'>Next Page/New Search</button>
+        <input id='current_offset' value='{{ current_offset|add:limits }}' type='hidden' name="current_offset">         {% comment %} Allows the next page funcionality by taking the current offset in the api call and adding the limit to it to get the next set of data from the search. {% endcomment%}
+        {% comment %} <a id='reset' href="..">Reset</a> {% endcomment %}
     </form>
 
+
+{% comment %} Sets location and size of map. {% endcomment %}
+    <div id="map" class="center-align" style="width: 100%; height: 600px; position: relative; al"></div>
+
+{% comment %} Parsing through the data from the API call to get the info to display. {% endcomment %}
     {% for i in data.RECDATA %}
-        <h2><a href="{% url 'g_kamp_app:campground' i.FacilityID forloop.counter0 %}">{{ i.FacilityName }}</a> -- {{ i.FacilityID }}</h2>
+        <h2><a href="{% url 'g_kamp_app:campground' i.FacilityID forloop.counter0 %}">{{ i.FacilityName }}</a> -- {{ i.FacilityID }}</h2>  {% comment %} Makes the facility name a hyperlink to its campground info with its campsites displayed. {% endcomment %}
+        <form action="{% url 'g_kamp_app:saved' %}" method='post'>
+            {% csrf_token %}
+            <input id='campground' value='{{ i.FacilityID }}' type='hidden' name='campground'>
+            <input type='submit'>
+        </form>
     {% endfor %}
+
+    <script>
+{% comment %} stateInfo pulls the specific state from the search. {% endcomment %}
+        let stateInfo = document.getElementById('state').value
+
+{% comment %} state contains the lat/long data plus zoom amount for mapping. {% endcomment %}
+        let states = {
+            "AL": {"name":'Alabama', 'lat': 32.318231, 'long': -86.902298, 'zoom': 7},
+            "AK": {'name':'Alaska', 'lat': 63.588753, 'long': -154.493062, 'zoom': 4},
+            "AZ": {'name':'Arizona', 'lat': 34.048928, 'long': -111.093731, 'zoom': 7},
+            "AR": {'name':'Arkansas', 'lat': 35.20105, 'long': -91.831833, 'zoom': 7},
+            "CA": {'name':'California', 'lat': 36.778261, 'long': -119.417932, 'zoom': 5},
+            "CO": {'name':'Colorado', 'lat': 39.0051, 'long': -105.782067, 'zoom': 7},
+            "CT": {'name':'Connecticut', 'lat': 41.603221, 'long': -73.087749, 'zoom': 8},
+            "DE": {'name':'Delaware', 'lat': 38.910832, 'long': -75.52767, 'zoom': 8},
+            "DC": {'name':'District Of Columbia', 'lat': 38.905985, 'long': -77.033418, 'zoom': 9},
+            "FL": {'name':'Florida', 'lat': 27.664827, 'long': -81.515754, 'zoom': 6},
+            "GA": {'name':'Georgia', 'lat': 32.157435, 'long': -82.907123, 'zoom': 7},
+            "HI": {'name':'Hawaii', 'lat': 19.898682, 'long': -155.665857, 'zoom': 6},
+            "ID": {'name':'Idaho', 'lat': 45.068202, 'long': -114.742041, 'zoom': 6},
+            "IL": {'name':'Illinois', 'lat': 40.633125, 'long': -89.398528, 'zoom': 7},
+            "IN": {'name':'Indiana', 'lat': 40.551217, 'long': -85.602364, 'zoom': 7},
+            "IA": {'name':'Iowa', 'lat': 41.878003, 'long': -93.097702	, 'zoom': 7},
+            "KS": {'name':'Kansas', 'lat': 39.011902, 'long': -98.484246, 'zoom': 7},
+            "KY": {'name':'Kentucky', 'lat': 37.839333, 'long': -84.270018, 'zoom': 7},
+            "LA": {'name':'Louisiana', 'lat': 31.244823, 'long': -92.145024, 'zoom': 7},
+            "ME": {'name':'Maine', 'lat': 45.253783, 'long': -69.445469, 'zoom': 7},
+            "MD": {'name':'Maryland', 'lat': 39.045755, 'long': -76.641271, 'zoom': 8},
+            "MA": {'name':'Massachusetts', 'lat': 42.407211, 'long': -71.382437, 'zoom': 8},
+            "MI": {'name':'Michigan', 'lat': 44.314844, 'long': -85.602364, 'zoom': 6},
+            "MN": {'name':'Minnesota', 'lat': 46.729553, 'long': -94.6859, 'zoom': 7},
+            "MS": {'name':'Mississippi', 'lat': 32.354668, 'long': -89.398528, 'zoom': 7},
+            "MO": {'name':'Missouri', 'lat': 37.964253, 'long': -91.831833, 'zoom': 7},
+            "MT": {'name':'Montana', 'lat': 46.879682, 'long': -110.362566, 'zoom': 6},
+            "NE": {'name':'Nebraska', 'lat': 41.492537, 'long': -99.901813, 'zoom': 7},
+            "NV": {'name':'Nevada', 'lat': 38.80261, 'long': -116.419389, 'zoom': 7},
+            "NH": {'name':'New Hampshire', 'lat': 43.193852, 'long': -71.572395, 'zoom': 8},
+            "NJ": {'name':'New Jersey', 'lat': 40.058324, 'long': -74.405661, 'zoom': 8},
+            "NM": {'name':'New Mexico', 'lat': 34.97273, 'long': -105.032363, 'zoom': 7},
+            "NY": {'name':'New York', 'lat': 43.299428, 'long': -74.217933, 'zoom': 7},
+            "NC": {'name':'North Carolina', 'lat': 35.759573, 'long': -79.0193, 'zoom': 7},
+            "ND": {'name':'North Dakota', 'lat': 47.551493, 'long': -101.002012, 'zoom': 7},
+            "OH": {'name':'Ohio', 'lat': 40.417287, 'long': -82.907123, 'zoom': 7},
+            "OK": {'name':'Oklahoma', 'lat': 35.007752, 'long': -97.092877, 'zoom': 7},
+            "OR": {'name':'Oregon', 'lat': 43.804133, 'long': -120.554201, 'zoom': 7},
+            "PA": {'name':'Pennsylvania', 'lat': 41.203322, 'long': -77.194525, 'zoom': 7},
+            "RI": {'name':'Rhode Island', 'lat': 41.580095, 'long': -71.477429, 'zoom': 9},
+            "SC": {'name':'South Carolina', 'lat': 33.836081, 'long': -81.163725, 'zoom': 7},
+            "SD": {'name':'South Dakota', 'lat': 43.969515, 'long': -99.901813, 'zoom': 7},
+            "TN": {'name':'Tennessee', 'lat': 35.517491, 'long': -86.580447, 'zoom': 7},
+            "TX": {'name':'Texas', 'lat': 31.568599, 'long': -99.901813, 'zoom': 6},
+            "UT": {'name':'Utah', 'lat': 39.52098, 'long': -111.093731, 'zoom': 7},
+            "VT": {'name':'Vermont', 'lat': 44.558803, 'long': -72.577841, 'zoom': 8},
+            "VA": {'name':'Virginia', 'lat': 37.431573, 'long': -78.656894, 'zoom': 7},
+            "WA": {'name':'Washington', 'lat': 47.751074, 'long': -120.740139, 'zoom': 7},
+            "WV": {'name':'West Virginia', 'lat': 38.597626, 'long': -80.454903, 'zoom': 7},
+            "WI": {'name':'Wisconsin', 'lat': 43.78444, 'long': -88.787868, 'zoom': 7},
+            "WY": {'name':'Wyoming', 'lat': 43.075968, 'long': -107.290284, 'zoom': 7},
+        }
+
+{% comment %} Call the getsessiondata function in the views.py to get the data for the campgrounds {% endcomment %}
+       axios({
+            method: 'get',
+            url: '{% url "g_kamp_app:getsessiondata" %}'
+       }).then((data) => {
+            console.log(data.data.RECDATA)
+       
+{% comment %} USA Central cordanance 37.0902, -95.7129 for if I can get the map animiation to work at some point. {% endcomment %}
+
+{% comment %} Initializing map with data point from the state being searched. {% endcomment %}
+            var map = L.map('map').setView([states[stateInfo].lat, states[stateInfo].long], states[stateInfo].zoom)
+
+            var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+             {% comment %} map.flyTo([states[stateInfo].lat, states[stateInfo].long], states[stateInfo].zoom, {animate:true, duration:1.5} )  {% endcomment %}
+
+{% comment %} Creates the markers and displays the facility data when marker is clicked on.  Plus has a hyperlink as the name as well. {% endcomment %}
+            for (let [index, mark] of data.data.RECDATA.entries()){
+                let markLat = mark.FacilityLatitude
+                let markLong = mark.FacilityLongitude
+                let marker = L.marker([markLat, markLong]).addTo(map)
+                marker.bindPopup(`<a href = "../campground/${mark.FacilityID}/${index}">${mark.FacilityName}</a> -- ${mark.FacilityID}`)
+            }
+        })
+    </script>
 
 {% endblock content %}

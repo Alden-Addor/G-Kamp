@@ -5,5 +5,7 @@ app_name = 'g_kamp_app'
 urlpatterns = [
     path('', views.home, name='home'),
     path('search/', views.search, name='search'),
-    path('campground/<int:facilityID>/<int:index>', views.campground, name='campground')
+    path('campground/<int:facilityID>/<int:index>', views.campground, name='campground'),
+    path('getsessiondata/', views.getSessionData, name='getsessiondata'),
+    path('save/', views.savedCampground, name='saved')
 ]
