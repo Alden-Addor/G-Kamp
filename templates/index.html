@@ -19,9 +19,10 @@
             <div class="nav-wrapper">
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
                     <li>{% block nav %}{% endblock nav %}</li>
-                    {% if user.is_authenticated %}
+                    {% if request.user.is_authenticated %}
                         <li>Hi {{ user.username }}!</li>
                         <li><a href="{% url 'logout' %}">Log Out</a></li>
+                        <li><a href="{% url 'g_kamp_app:profile' %}">Profile</a></li>
                     {% endif %}
                     <li><a href="{% url 'g_kamp_app:home' %}">Home</a> </li>
                 <ul>

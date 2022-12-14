@@ -2,7 +2,6 @@
 
 {% block content %}
 
-{% comment %} Parses through both campsite and campground data to display. Has logic to tell the user if there isn't any campsites in the campground. {% endcomment %}
 {% if campsites.METADATA.RESULTS.TOTAL_COUNT == 0 %}
     <p>Sorry, but this campground doesn't have any campsites avalible.</p>
 {% else %}
@@ -39,7 +38,7 @@
 {% endif %}<br>
 
 {% comment %} Form to create foward and back buttons to scoll through the campsites. {% endcomment %}
-<form action="{% url 'g_kamp_app:campground' data.FacilityID index %}" method='get'>
+<form action="{% url 'g_kamp_app:campsites' data.FacilityID %}" method='get'>
     {% csrf_token %}
     <input id='offset' value='{{ offset }}' name='offset' type='hidden'>
     <input id='limit' value='{{ params.limit }}' name='limit' type='hidden'>
@@ -77,4 +76,3 @@
 </script>
 
 {% endblock content %}
-

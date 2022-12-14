@@ -1,0 +1,35 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<div id="map" class="center-align" style="width: 100%; height: 600px; position: relative; al"></div>
+
+<h2><a href="{% url 'g_kamp_app:campsites' data.FacilityID %}">{{ data.FacilityName }}</a> -- {{ data.FacilityID }}</h2>
+
+<input type='hidden' id='lat' value='{{ data.FacilityLatitude }}'>
+<input type='hidden' id='long' value='{{ data.FacilityLongitude }}'>
+<input type='hidden' id='name' value='{{ data.FacilityName }}'>
+<input type='hidden' id='IDnum' value='{{ data.FacilityID }}'>
+
+<script>
+
+    let facilityLat = document.getElementById('lat').value
+    let facilityLong = document.getElementById('long').value
+    let facilityName = document.getElementById('name').value
+    let facilityID = document.getElementById('IDnum').value
+    console.log(facilityLat)
+    console.log(facilityLong)
+
+    var map = L.map('map').setView([facilityLat, facilityLong], 7)
+
+    var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    let marker = L.marker([facilityLat, facilityLong]).addTo(map)
+    marker.bindPopup(`<a href = "../../campsites/${facilityID}">${facilityName}</a>`)
+
+</script>
+
+{% endblock content %}

@@ -24,8 +24,8 @@ def session_login(request):
         user = authenticate(request, username = username, password = password)
         if user is not None:
             login(request, user)
-            session = SessionStore(session_key = user.session_key)
-            request.session = session
+            # session = SessionStore(session_key = user.session_key)
+            # request.session = session
             return HttpResponseRedirect(reverse_lazy('home'))
         else:
             return HttpResponseRedirect(reverse_lazy('signup'))

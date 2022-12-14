@@ -93,8 +93,30 @@ def getSessionData(request): # Using this to get the data from the API calls int
 
 def savedCampground(request):
     if request.user.is_authenticated == True:
-        campground = request.POST['campground']
-        Saved.objects.create(campground = campground, user = request.user)
-        return HttpResponseRedirect(reverse('g_kamp_app:search'))
+        campground = request.GET.get('campground')
+        name= request.GET.get('name')
+        Saved.objects.create(campground = campground, user = request.user, name=name)
+        return JsonResponse({'message': 'Saved Campground'})
     else:
         return HttpResponseRedirect(reverse('login'))
+
+def profile(request):
+    saved_data = Saved.objects.all()
+    data = request.session['data']
+    return render(request, 'profile.html', {'data': data, 'saved_data':saved_data})
+
+def pro_search(request, facilityID):
+    data = requests.get(f'https://ridb.recreation.gov/api/v1/facilities/{facilityID}?apikey=dfed6d80-0ffe-4284-ac92-91a0fc1b901b').json()
+    print(data)
+    request.session['saved'] = data
+    return render(request, 'pro_search.html', {'data': data})
+
+def campsites(request, facilityID):
+    saved = request.session['saved']
+    page = request.GET.get('offset', 0)
+    params = {
+        'limit': 24,
+        'offset': page
+    }
+    campsites = requests.get(f'https://ridb.recreation.gov/api/v1/facilities/{facilityID}/campsites?apikey=dfed6d80-0ffe-4284-ac92-91a0fc1b901b', params = params).json()
+    return render(request, 'campsites.html', {'campsites': campsites, 'data': saved, 'params':params, 'offset': page,})

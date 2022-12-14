@@ -3,6 +3,7 @@
 {% block content %}
 
 {% comment %} Form has saved data from initial search on the home page {% endcomment %}
+{% if data.RECDATA%}
     <form action="{% url 'g_kamp_app:search' %}" method="get">
         {% csrf_token %}
         <input id='limits' value="{{ limits }}" type='number' name='limits' placeholder='max 50'>
@@ -21,22 +22,38 @@
         <input id='current_offset' value='{{ current_offset|add:limits }}' type='hidden' name="current_offset">         {% comment %} Allows the next page funcionality by taking the current offset in the api call and adding the limit to it to get the next set of data from the search. {% endcomment%}
         {% comment %} <a id='reset' href="..">Reset</a> {% endcomment %}
     </form>
-
+{% endif %}
 
 {% comment %} Sets location and size of map. {% endcomment %}
     <div id="map" class="center-align" style="width: 100%; height: 600px; position: relative; al"></div>
 
 {% comment %} Parsing through the data from the API call to get the info to display. {% endcomment %}
     {% for i in data.RECDATA %}
-        <h2><a href="{% url 'g_kamp_app:campground' i.FacilityID forloop.counter0 %}">{{ i.FacilityName }}</a> -- {{ i.FacilityID }}</h2>  {% comment %} Makes the facility name a hyperlink to its campground info with its campsites displayed. {% endcomment %}
-        <form action="{% url 'g_kamp_app:saved' %}" method='post'>
-            {% csrf_token %}
-            <input id='campground' value='{{ i.FacilityID }}' type='hidden' name='campground'>
-            <input type='submit'>
-        </form>
+        <li><a href="{% url 'g_kamp_app:campground' i.FacilityID forloop.counter0 %}">{{ i.FacilityName }}</a> -- {{ i.FacilityID }}</li>  {% comment %} Makes the facility name a hyperlink to its campground info with its campsites displayed. {% endcomment %}
+        <button id='{{ i.FacilityID }}' name='{{ i.FacilityName }}' class='save_button'>Save</button>
     {% endfor %}
 
     <script>
+        let buttons = document.querySelectorAll('.save_button')
+        buttons.forEach(button => {
+            button.addEventListener('click', (event)=> saved(event))
+        })
+        function saved(event){
+            event.preventDefault()
+            campground = event.target.id
+            name = event.target.name
+            axios({
+                method: 'get',
+                url: '{% url "g_kamp_app:saved" %}',
+                params: {
+                    campground,
+                    name
+                }
+            }).then((data) =>{
+                alert('Campground saved!')
+            })
+        }
+
 {% comment %} stateInfo pulls the specific state from the search. {% endcomment %}
         let stateInfo = document.getElementById('state').value
 
