@@ -6,19 +6,25 @@
 {% if data.RECDATA%}
     <form action="{% url 'g_kamp_app:search' %}" method="get">
         {% csrf_token %}
-        <input id='limits' value="{{ limits }}" type='number' name='limits' placeholder='max 50'>
-        <select id='state' value="{{ state }}" name='state'>
+        <div class='row'>
+            <div class='input-field col s6 m6'>
+                <input id='limits' value="{{ limits }}" type='number' name='limits' placeholder='max 50'>
+            </div>
+            <div class="input-field col s6 m6">
+                <select id='state' value="{{ state }}" name='state'>
 {% comment %} For loop to that gets state data from states variable that is saved in the search view {% endcomment %}
-            {% for key, name in states.items%}
-                {% if key == state %}
-                    <option selected value="{{ key }}">{{ name }}</option>
-                {% else %}
-                    <option value="{{ key }}">{{ name }}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
-            <button id='pageBack' type='submit'>Previous Page</button>
-            <button type='submit'>Next Page/New Search</button>
+                    {% for key, name in states.items%}
+                        {% if key == state %}
+                            <option selected value="{{ key }}">{{ name }}</option>
+                        {% else %}
+                            <option value="{{ key }}">{{ name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button style="margin-left: 1em; margin-bottom: 2em" id='pageBack' type='submit'>Previous Page</button>
+        <button type='submit'>Next Page/New Search</button>
         <input id='current_offset' value='{{ current_offset|add:limits }}' type='hidden' name="current_offset">         {% comment %} Allows the next page funcionality by taking the current offset in the api call and adding the limit to it to get the next set of data from the search. {% endcomment%}
         {% comment %} <a id='reset' href="..">Reset</a> {% endcomment %}
     </form>
@@ -28,12 +34,31 @@
     <div id="map" class="center-align" style="width: 100%; height: 600px; position: relative; al"></div>
 
 {% comment %} Parsing through the data from the API call to get the info to display. {% endcomment %}
-    {% for i in data.RECDATA %}
-        <li><a href="{% url 'g_kamp_app:campground' i.FacilityID forloop.counter0 %}">{{ i.FacilityName }}</a> -- {{ i.FacilityID }}</li>  {% comment %} Makes the facility name a hyperlink to its campground info with its campsites displayed. {% endcomment %}
-        <button id='{{ i.FacilityID }}' name='{{ i.FacilityName }}' class='save_button'>Save</button>
-    {% endfor %}
+    <div class='row'>
+        {% for i in data.RECDATA %}
+        <div class='col s12 m4 l4'>
+            <div class='card small deep-purple lighten-4'>
+                <div class='card-content white text'>
+                    <span class='card-title'><a href="{% url 'g_kamp_app:campground' i.FacilityID forloop.counter0 %}">{{ i.FacilityName }}</a></span>  {% comment %} Makes the facility name a hyperlink to its campground info with its campsites displayed. {% endcomment %}
+                    {% if i.FacilityPhone == '' %}
+                    {% else %}
+                        <p>Phone: {{ i.FacilityPhone }}</p>
+                    {% endif %}
+                    {% if i.FacilityEmail == '' %}
+                    {% else %}
+                        <p>Email: {{ i.FacilityEmail }}</p>
+                    {% endif %}
+                </div>
+                <div class='card-action'>
+                    <button id='{{ i.FacilityID }}' name='{{ i.FacilityName }}' class='save_button'>Save</button>
+                </div>
+            </div>
+        </div>    
+        {% endfor %}
+    </div>
 
     <script>
+{% comment %} JavaScript for save funcionality saving the campground ID and name to allow to be call back if cookies gets cleared, clearing the session data. {% endcomment %}
         let buttons = document.querySelectorAll('.save_button')
         buttons.forEach(button => {
             button.addEventListener('click', (event)=> saved(event))
@@ -59,7 +84,7 @@
 
 {% comment %} state contains the lat/long data plus zoom amount for mapping. {% endcomment %}
         let states = {
-            "AL": {"name":'Alabama', 'lat': 32.318231, 'long': -86.902298, 'zoom': 7},
+            "AL": {"name":'Alabama', 'lat': 32.618231, 'long': -86.902298, 'zoom': 7},
             "AK": {'name':'Alaska', 'lat': 63.588753, 'long': -154.493062, 'zoom': 4},
             "AZ": {'name':'Arizona', 'lat': 34.048928, 'long': -111.093731, 'zoom': 7},
             "AR": {'name':'Arkansas', 'lat': 35.20105, 'long': -91.831833, 'zoom': 7},
@@ -69,7 +94,7 @@
             "DE": {'name':'Delaware', 'lat': 38.910832, 'long': -75.52767, 'zoom': 8},
             "DC": {'name':'District Of Columbia', 'lat': 38.905985, 'long': -77.033418, 'zoom': 9},
             "FL": {'name':'Florida', 'lat': 27.664827, 'long': -81.515754, 'zoom': 6},
-            "GA": {'name':'Georgia', 'lat': 32.157435, 'long': -82.907123, 'zoom': 7},
+            "GA": {'name':'Georgia', 'lat': 32.67435, 'long': -82.907123, 'zoom': 7},
             "HI": {'name':'Hawaii', 'lat': 19.898682, 'long': -155.665857, 'zoom': 6},
             "ID": {'name':'Idaho', 'lat': 45.068202, 'long': -114.742041, 'zoom': 6},
             "IL": {'name':'Illinois', 'lat': 40.633125, 'long': -89.398528, 'zoom': 7},
@@ -83,7 +108,7 @@
             "MA": {'name':'Massachusetts', 'lat': 42.407211, 'long': -71.382437, 'zoom': 8},
             "MI": {'name':'Michigan', 'lat': 44.314844, 'long': -85.602364, 'zoom': 6},
             "MN": {'name':'Minnesota', 'lat': 46.729553, 'long': -94.6859, 'zoom': 7},
-            "MS": {'name':'Mississippi', 'lat': 32.354668, 'long': -89.398528, 'zoom': 7},
+            "MS": {'name':'Mississippi', 'lat': 32.554668, 'long': -89.398528, 'zoom': 7},
             "MO": {'name':'Missouri', 'lat': 37.964253, 'long': -91.831833, 'zoom': 7},
             "MT": {'name':'Montana', 'lat': 46.879682, 'long': -110.362566, 'zoom': 6},
             "NE": {'name':'Nebraska', 'lat': 41.492537, 'long': -99.901813, 'zoom': 7},
@@ -122,6 +147,7 @@
 {% comment %} USA Central cordanance 37.0902, -95.7129 for if I can get the map animiation to work at some point. {% endcomment %}
 
 {% comment %} Initializing map with data point from the state being searched. {% endcomment %}
+
             var map = L.map('map').setView([states[stateInfo].lat, states[stateInfo].long], states[stateInfo].zoom)
 
             var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -131,6 +157,7 @@
              {% comment %} map.flyTo([states[stateInfo].lat, states[stateInfo].long], states[stateInfo].zoom, {animate:true, duration:1.5} )  {% endcomment %}
 
 {% comment %} Creates the markers and displays the facility data when marker is clicked on.  Plus has a hyperlink as the name as well. {% endcomment %}
+
             for (let [index, mark] of data.data.RECDATA.entries()){
                 let markLat = mark.FacilityLatitude
                 let markLong = mark.FacilityLongitude

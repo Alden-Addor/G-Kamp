@@ -1,26 +1,38 @@
 {% extends 'index.html' %}
 
-{% block nav %}
+{% comment %} {% block nav %}
 
 {% if user.is_authenticated %}
-    {% comment %} <p>Hi {{ user.username }}!</p>
-    <a href="{% url 'logout' %}">Log Out</a> {% endcomment %}
+    <p>Hi {{ user.username }}!</p>
+    <a href="{% url 'logout' %}">Log Out</a>
 {% else %}
     <li>Please log in or signup!</li>
     <li><a href="{% url 'login' %}">Log In</a></li>
     <li><a href="{% url 'signup' %}">Sign Up</a></li>
 {% endif %}
 
-{% comment %} <a href="{% url 'g_kamp_app:home' %}">Home</a> {% endcomment %}
+<a href="{% url 'g_kamp_app:home' %}">Home</a>
 
-{% endblock nav %}
+{% endblock nav %} {% endcomment %}
 
 {% block content %}
-
+    <div id="index-banner" class='parallax-container'>
+        <div class'section no-pad-bot'>
+            <div class='container'>
+                <br><br>
+                <h1 class='header center white-text'>Camping with the governments finest!</h1>
+            </div>
+        </div>
+        <div class='parallax'>
+            <img src='https://images.pexels.com/photos/24698/pexels-photo-24698.jpg' width='1500px' style='transform: translate3d(-50%, 300.435px, 0px); opacity: 1;' alt='Arial view of RV driving through forest'>
+        </div>
+    </div>
     <form action="{% url 'g_kamp_app:search' %}" method="get">
         {% csrf_token %}
         <div class='row'>
-            <input class='col s6 m6' id='limits' value="limits" type='number' name='limits' placeholder='max 50'>
+            <div class='input-field col s6 m6'>
+                <input id='limits' value="limits" type='number' name='limits' placeholder='max 50'>
+            </div>
             <div class="input-field col s6 m6">
                 <select id='state' value="state" name='state'>
                     <option value="" disable selected>Choose a State</option>
@@ -78,7 +90,7 @@
                 </select>
             </div>  
         </div>
-        <button type='submit'>Search</button>
+        <button type='submit' style="margin-left: 1em;">Search</button>
     </form>
     
     {% comment %} <form action="{% url g_kamp_app:campground %}" method="get"> {% endcomment %}

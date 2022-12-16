@@ -3,8 +3,17 @@
 {% block content %}
 
 <div id="map" class="center-align" style="width: 100%; height: 600px; position: relative; al"></div>
-
-<h2><a href="{% url 'g_kamp_app:campsites' data.FacilityID %}">{{ data.FacilityName }}</a> -- {{ data.FacilityID }}</h2>
+<div style='text-align: center'>
+    <h2><a href="{% url 'g_kamp_app:campsites' data.FacilityID %}">{{ data.FacilityName }}</a></h2>
+    {% if data.FacilityPhone == '' %}
+    {% else %}
+        <p>Phone: {{ data.FacilityPhone }}</p>
+    {% endif %}
+    {% if data.FacilityEmail == '' %}
+    {% else %}
+        <p>Email: {{ data.FacilityEmail }}</p>
+    {% endif %}
+</div>
 
 <input type='hidden' id='lat' value='{{ data.FacilityLatitude }}'>
 <input type='hidden' id='long' value='{{ data.FacilityLongitude }}'>

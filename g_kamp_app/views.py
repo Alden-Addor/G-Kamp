@@ -101,9 +101,9 @@ def savedCampground(request):
         return HttpResponseRedirect(reverse('login'))
 
 def profile(request):
-    saved_data = Saved.objects.all()
-    data = request.session['data']
-    return render(request, 'profile.html', {'data': data, 'saved_data':saved_data})
+    saved_data = Saved.objects.filter(user=request.user)
+    # data = request.session['data']
+    return render(request, 'profile.html', {'saved_data':saved_data})
 
 def pro_search(request, facilityID):
     data = requests.get(f'https://ridb.recreation.gov/api/v1/facilities/{facilityID}?apikey=dfed6d80-0ffe-4284-ac92-91a0fc1b901b').json()

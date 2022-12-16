@@ -3,6 +3,7 @@
 {% block title %}Log In{% endblock %}
 
 {% block content %}
+<div style='margin: 2em;'>
     <h2>Log In G-Kamp</h2>
     <form method="post">
         {% csrf_token %}
@@ -10,4 +11,5 @@
         <input type='password' id="password" name='password' placeholder='Password'>
         <button type="submit">Log In</button>
     </form>
+</div>
 {% endblock %}

@@ -5,10 +5,10 @@
 <div class='row'>
     {% for i in saved_data %}
     <div class='col s12 m4 l3'>
-        <div class='card'>
+        <div class='card deep-purple lighten-4'>
             <div class='card-image'>    
-                <img src='https://img.rawpixel.com/s3fs-private/rawpixel_images/website_content/fl33668659181-image-kvlw4eyw.jpg?w=800&dpr=1&fit=default&crop=default&q=65&vib=3&con=3&usm=15&bg=F4F4F3&ixlib=js-2.2.1&s=c1e23ffb7e7e705a55406596addd6632' style='height:186px; width:248px; object-fit: cover;'>
-                <span class='card-title'>{{ i.name }}</span>
+                <img src='https://img.rawpixel.com/s3fs-private/rawpixel_images/website_content/fl33668659181-image-kvlw4eyw.jpg?w=800&dpr=1&fit=default&crop=default&q=65&vib=3&con=3&usm=15&bg=F4F4F3&ixlib=js-2.2.1&s=c1e23ffb7e7e705a55406596addd6632' style='height:186px; width:100%; object-fit: cover;'>
+                <span class='card-title' style='background-color: #6AA7AD9d; border-radius: 25%' >{{ i.name }}</span>
             </div>
             <div class='card-content'>
                 <a href="{% url 'g_kamp_app:pro_search' i.campground %}">{{ i.campground }}</a>

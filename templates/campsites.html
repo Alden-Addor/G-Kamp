@@ -1,53 +1,62 @@
 {% extends 'index.html' %}
 
 {% block content %}
-
-{% if campsites.METADATA.RESULTS.TOTAL_COUNT == 0 %}
-    <p>Sorry, but this campground doesn't have any campsites avalible.</p>
-{% else %}
-    <h1>{{ data.FacilityName }}</h1>
-    <p id='description'>{{ data.FacilityDescription }}</p>
-    
-    <div class='row'>
-        {% for i in campsites.RECDATA %}
-        <div class='col s12 m4 l3'>
-            <div class='card'>
-                <div class='card-image'>
-                    <picture>
-                        {% comment %} <img src=`{{ i.ENTITIYMEDIA[0].URL }}`> {% endcomment %}
-                        {% for img in i.ENTITYMEDIA%}
-                            <source srcset="{{ img.URL }}">
-                        {% endfor %}
-                        <img src='https://assets.atlasobscura.com/media/W1siZiIsInVwbG9hZHMvYXNzZXRzLzM2OWI2OWU0LTZmYmQtNDIxMy1hNmJiLTgxZGIxNGE4NDg3MDUyYmE5ZTQyMjVkNGZlYTVhN19ydi5jYW1waW5nLjEuanBnIl0sWyJwIiwiY29udmVydCIsIiJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA4MSAtYXV0by1vcmllbnQiXSxbInAiLCJ0aHVtYiIsIjEyODB4PiJdXQ/rv.camping.1.jpg' style='height:186px; width:248px; object-fit: cover;'>
-                    </picture>
-                    <span class='card-title'>{{ i.CampsiteName }}</span>
-                </div>
-                <div class='card-content'>
-                    <p>{{ i.CampsiteType }}</p>
-                    <p>Please click <a href='https://www.recreation.gov/camping/campsites/{{ i.CampsiteID }}'>Reservations</a> to check avalibility and get detailed info about this campsite.</p>
-                </div>
-                {% comment %} <div class='card-action'>
-                    <a href="#">This is a link</a>
-                </div> {% endcomment %}
-            </div>
+<div class='Campground_condent'>
+    {% comment %} Parses through both campsite and campground data to display. Has logic to tell the user if there isn't any campsites in the campground. {% endcomment %}
+    {% if campsites.METADATA.RESULTS.TOTAL_COUNT == 0 %}
+        <p>Sorry, but this campground doesn't have any campsites avalible.</p>
+    {% else %}
+        <h1 style='color: #3b5c60'><i class="fa-solid fa-campground" ></i> {{ data.FacilityName }}</h1>
+        <div class='description'>
+            <p id='description'>{{ data.FacilityDescription }}</p><br>
+            <h2>Directions</h2>
+            <p id='description'>{{ data.FacilityDirections }}</p>
         </div>
-        {% endfor %}
-    </div>
-            
-        
-{% endif %}<br>
+</div>
+        <div class='row'>
+            {% for i in campsites.RECDATA %}
+            <div class='col s12 m4 l3'>
+                <div class='card deep-purple lighten-4'>
+                    <div class='card-image'>
+                        <picture>
+                            {% comment %} <img src=`{{ i.ENTITIYMEDIA[0].URL }}`> {% endcomment %}
+                            {% for img in i.ENTITYMEDIA%}
+                                <source srcset="{{ img.URL }}">
+                            {% endfor %}
+                            <img src='https://assets.atlasobscura.com/media/W1siZiIsInVwbG9hZHMvYXNzZXRzLzM2OWI2OWU0LTZmYmQtNDIxMy1hNmJiLTgxZGIxNGE4NDg3MDUyYmE5ZTQyMjVkNGZlYTVhN19ydi5jYW1waW5nLjEuanBnIl0sWyJwIiwiY29udmVydCIsIiJdLFsicCIsImNvbnZlcnQiLCItcXVhbGl0eSA4MSAtYXV0by1vcmllbnQiXSxbInAiLCJ0aHVtYiIsIjEyODB4PiJdXQ/rv.camping.1.jpg' style='height:186px; width:100%; object-fit: cover;'>
+                        </picture>
+                        <span class='card-title'>{{ i.CampsiteName }}</span>
+                    </div>
+                    <div class='card-content'>
+                        <p>{{ i.CampsiteType }}</p>
+                        <p>Please click <a href='https://www.recreation.gov/camping/campsites/{{ i.CampsiteID }}'>Reservations</a> to check avalibility and get detailed info about this campsite.</p>
+                    </div>
+                    {% comment %} <div class='card-action'>
+                        <a href="#">This is a link</a>
+                    </div> {% endcomment %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>    
+    {% endif %}<br>
 
 {% comment %} Form to create foward and back buttons to scoll through the campsites. {% endcomment %}
 <form action="{% url 'g_kamp_app:campsites' data.FacilityID %}" method='get'>
     {% csrf_token %}
     <input id='offset' value='{{ offset }}' name='offset' type='hidden'>
     <input id='limit' value='{{ params.limit }}' name='limit' type='hidden'>
-    {% if campsites.METADATA.SEARCH_PARAMETERS.OFFSET > 0%}
-        <button id='back' type='submit'>Back</button>
-    {% endif %}
-    {% if campsites.METADATA.RESULTS.CURRENT_COUNT == 24 %}
-        <button id='forward' type='submit'>Next</button>
-    {% endif %}
+    <div class='row'>
+        <div class='col s1 offset-s5'>
+            {% if campsites.METADATA.SEARCH_PARAMETERS.OFFSET > 0%}
+                <button id='back' type='submit'>Back</button>
+            {% endif %}
+        </div>
+        <div class='col s1'>
+            {% if campsites.METADATA.RESULTS.CURRENT_COUNT == 24 %}
+                <button id='forward' type='submit'>Next</button>
+            {% endif %}
+        </div>
+    </div>
 </form>
 
 
